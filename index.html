@@ -19,7 +19,6 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* Nutzen der dynamischen Viewport-Höhe (100dvh) für mobile Browser */
         html, body {
             height: 100dvh;
             width: 100vw;
@@ -38,7 +37,6 @@
 
         .container {
             width: 100%;
-            /* max-width: 440px; */
             height: 100%;
             background: var(--card-bg);
             border-radius: 16px;
@@ -64,11 +62,31 @@
             flex-shrink: 0;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .badge {
             background: rgba(255, 255, 255, 0.2);
             padding: 2px 8px;
             border-radius: 20px;
             font-size: 0.75rem;
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .tab-bar {
@@ -111,7 +129,6 @@
             display: flex;
         }
 
-        /* Der Katalog nimmt den verfügbaren Platz ein und scrollt bei Bedarf */
         .catalog-container {
             flex: 1;
             overflow-y: auto;
@@ -183,7 +200,6 @@
             font-size: 0.72rem;
         }
 
-        /* Der Warenkorb-Bereich klebt fest unten */
         .cart-section {
             background: #f8fafc;
             border: 1.5px solid var(--border);
@@ -198,6 +214,7 @@
             overflow-y: auto;
             margin-bottom: 4px;
             padding-right: 2px;
+            max-height: 120px;
         }
 
         .cart-item {
@@ -294,14 +311,41 @@
         }
 
         .modal-content {
-            transform: scale(1.5);
-            max-height: 50%;
             background: white;
             width: 100%;
             max-width: 480px;
+            max-height: 85vh;
             border-radius: 14px;
             padding: 12px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-list {
+            overflow-y: auto;
+            flex: 1;
+            margin-bottom: 8px;
+            padding-right: 2px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+
+        .setting-input {
+            width: 80px;
+            padding: 4px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            text-align: right;
         }
 
         .payment-options {
@@ -353,7 +397,6 @@
             padding: 6px;
             border-radius: 8px;
             margin-bottom: 8px;
-            /* font-weight: 600; */
             font-size: 0.85rem;
             text-align: center;
         }
@@ -379,7 +422,10 @@
 <div class="container">
     <header>
         <span>🎓 GDS1 Abi Kasse</span>
-        <span class="badge" id="headerItemCount">0 Stk.</span>
+        <div class="header-right">
+            <span class="badge" id="headerItemCount">0 Stk.</span>
+            <button class="settings-btn" onclick="openSettings()" title="Preise anpassen">⚙️</button>
+        </div>
     </header>
 
     <div class="tab-bar">
@@ -418,9 +464,19 @@
     </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <h3 style="margin: 0 0 8px 0; font-size: 0.95rem; text-align: center;">Preise anpassen</h3>
+        <div class="settings-list" id="settingsList"></div>
+        <button class="btn-main" onclick="saveSettings()" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); margin-bottom: 6px;">Speichern</button>
+        <button onclick="closeSettings()" style="width: 100%; background: #e2e8f0; border: none; padding: 7px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; color: var(--text-muted); cursor: pointer;">Abbrechen</button>
+    </div>
+</div>
+
 <!-- CHECKOUT MODAL -->
 <div class="modal" id="checkoutModal">
-    <div class="modal-content">
+    <div class="modal-content" style="max-height: 80vh;">
         <h3 style="margin: 0 0 8px 0; font-size: 0.95rem; text-align: center;">Zahlung abwickeln</h3>
         <div class="payment-options">
             <div class="pay-btn selected" id="btnPayCash" onclick="selectPayment('cash')">💵 Barzahlung</div>
@@ -461,7 +517,7 @@
 </div>
 
 <script>
-    const catalog = [
+    const defaultCatalog = [
         { category: "Speisen & Gebäck", items: [
             { id: "broetchen", name: "Belegtes Brötchen", price: 3.50, icon: "🥖" },
             { id: "crepes", name: "Crêpes", price: 3.00, icon: "🥞" },
@@ -474,7 +530,16 @@
         ]}
     ];
 
+    let catalog = loadCatalog();
     let cart = {};
+
+    function loadCatalog() {
+        let saved = localStorage.getItem('kassen_catalog');
+        if(saved) {
+            try { return JSON.parse(saved); } catch(e) {}
+        }
+        return JSON.parse(JSON.stringify(defaultCatalog));
+    }
 
     function init() {
         renderCatalog();
@@ -514,8 +579,50 @@
         container.innerHTML = html;
     }
 
+    function openSettings() {
+        const list = document.getElementById('settingsList');
+        let html = '';
+        catalog.forEach(cat => {
+            html += `<div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin: 6px 0 2px 0; text-transform: uppercase;">${cat.category}</div>`;
+            cat.items.forEach(item => {
+                html += `
+                    <div class="setting-row">
+                        <span>${item.icon} ${item.name}</span>
+                        <input type="number" step="0.01" class="setting-input" data-id="${item.id}" value="${item.price.toFixed(2)}">
+                    </div>
+                `;
+            });
+        });
+        list.innerHTML = html;
+        document.getElementById('settingsModal').style.display = 'flex';
+    }
+
+    function closeSettings() {
+        document.getElementById('settingsModal').style.display = 'none';
+    }
+
+    function saveSettings() {
+        const inputs = document.querySelectorAll('.setting-input');
+        inputs.forEach(input => {
+            let id = input.getAttribute('data-id');
+            let newPrice = parseFloat(input.value);
+            if(!isNaN(newPrice) && newPrice >= 0) {
+                catalog.forEach(cat => {
+                    cat.items.forEach(item => {
+                        if(item.id === id) item.price = newPrice;
+                    });
+                });
+            }
+        });
+        localStorage.setItem('kassen_catalog', JSON.stringify(catalog));
+        closeSettings();
+        renderCatalog();
+        updateCartUI();
+    }
+
     function addToCart(id, name, price, icon) {
         if(!cart[id]) cart[id] = { name, price, icon, qty: 0 };
+        cart[id].price = price; // Preis aktualisieren falls er geändert wurde
         cart[id].qty++;
         updateCartUI();
     }
