@@ -276,6 +276,7 @@
             overflow-y: auto;
             margin-bottom: 6px;
             padding-right: 2px;
+            max-height: 110px;
         }
 
         .cart-item {
@@ -364,6 +365,37 @@
             opacity: 0.35; 
             cursor: not-allowed; 
             box-shadow: none;
+        }
+
+        /* Stats Grid in Historie */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: var(--card-item-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .stat-title {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text);
         }
 
         .revenue-card {
@@ -580,7 +612,7 @@
 
     <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTab('kasse')">🛒 Kasse</button>
-        <button class="tab-btn" onclick="switchTab('historie')">📜 Historie</button>
+        <button class="tab-btn" onclick="switchTab('historie')">📜 Statistiken & Historie</button>
     </div>
 
     <!-- KASSE VIEW -->
@@ -610,6 +642,27 @@
             </div>
             <button onclick="clearHistory()" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">Löschen</button>
         </div>
+
+        <!-- Zusätzliche Statistiken -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Anzahl Verkäufe</div>
+                <div class="stat-value" id="statCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Durchschnitt / Verkauf</div>
+                <div class="stat-value" id="statAvg">0,00 €</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Beliebtestes Produkt</div>
+                <div class="stat-value" id="statTopProduct" style="font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Bar vs. Karte</div>
+                <div class="stat-value" id="statPaymentSplit" style="font-size: 0.78rem;">Bar: 0 | Karte: 0</div>
+            </div>
+        </div>
+
         <div class="history-list" id="historyList"></div>
     </div>
 </div>
@@ -627,7 +680,14 @@
 <!-- CHECKOUT MODAL -->
 <div class="modal" id="checkoutModal">
     <div class="modal-content" style="max-height: 80vh;">
-        <h3 style="margin: 0 0 10px 0; font-size: 1rem; text-align: center;">Zahlung abwickeln</h3>
+        <h3 style="margin: 0 0 4px 0; font-size: 1rem; text-align: center;">Zahlung abwickeln</h3>
+        
+        <!-- Zu zahlender Betrag in Grün hervorgehoben -->
+        <div style="text-align: center; margin-bottom: 12px; background: rgba(16, 185, 129, 0.12); padding: 10px; border-radius: 10px; border: 1.5px solid var(--success);">
+            <span style="font-size: 0.75rem; color: var(--success); font-weight: 800; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Zu zahlender Betrag</span>
+            <span id="checkoutTotalDisplay" style="font-size: 1.5rem; font-weight: 900; color: var(--success);">0,00 €</span>
+        </div>
+
         <div class="payment-options">
             <div class="pay-btn selected" id="btnPayCash" onclick="selectPayment('cash')">💵 Barzahlung</div>
             <div class="pay-btn" id="btnPayCard" onclick="selectPayment('card')">💳 SumUp Karte</div>
@@ -659,7 +719,7 @@
         <!-- Kartenzahlung -->
         <div id="cardSection" style="display: none; text-align: center; padding: 10px 0;">
             <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">Das SumUp Terminal wird über die App gestartet:</p>
-            <a href="#" id="sumupLink" class="btn-main" style="display: block; text-decoration: none; line-height: 20px;" onclick="completeCardSale()">SumUp App öffnen</a>
+            <a href="#" id="sumupLink" class="btn-main" style="display: block; text-decoration: none; line-height: 20px;" onclick="completeCardSale()">SumUp App öffnen (<span id="sumupBtnAmount">0,00 €</span>)</a>
         </div>
 
         <button class="btn-cancel" onclick="closeCheckout()">Abbrechen</button>
@@ -878,6 +938,11 @@
     function openCheckout() {
         vibrate([20, 30, 20]);
         const { total } = getCartTotal();
+        const formattedTotal = total.toFixed(2) + ' €';
+        
+        document.getElementById('checkoutTotalDisplay').innerText = formattedTotal;
+        document.getElementById('sumupBtnAmount').innerText = formattedTotal;
+
         document.getElementById('givenAmount').value = '';
         calcChange();
         
@@ -941,19 +1006,26 @@
         }
     }
 
-    function triggerConfetti() {
+    // Mehr Konfetti-Overkill für den Abschluss
+    function triggerOverkillConfetti() {
         if (typeof confetti === 'function') {
+            // Standard-Burst
             confetti({
-                particleCount: 80,
-                spread: 70,
+                particleCount: 120,
+                spread: 100,
                 origin: { y: 0.6 }
             });
+            // Seitliche Kanonen nach kurzer Verzögerung
+            setTimeout(() => {
+                confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0 } });
+                confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 } });
+            }, 250);
         }
     }
 
     function completeSale(method) {
         vibrate([40, 60, 40]);
-        triggerConfetti();
+        triggerOverkillConfetti();
 
         const { total } = getCartTotal();
         let history = JSON.parse(localStorage.getItem('kassen_history') || '[]');
@@ -981,6 +1053,40 @@
         
         let sum = history.reduce((acc, sale) => acc + parseFloat(sale.total), 0);
         document.getElementById('totalRevenue').innerText = sum.toFixed(2) + ' €';
+
+        // Statistiken berechnen
+        let totalSalesCount = history.length;
+        let avgSale = totalSalesCount > 0 ? sum / totalSalesCount : 0;
+        
+        let cashCount = 0;
+        let cardCount = 0;
+        let productCounts = {};
+
+        history.forEach(sale => {
+            if(sale.method === 'Bar') cashCount++;
+            else cardCount++;
+
+            for(let id in sale.items) {
+                let p = sale.items[id];
+                if(!productCounts[p.name]) productCounts[p.name] = 0;
+                productCounts[p.name] += p.qty;
+            }
+        });
+
+        let topProduct = '-';
+        let maxQty = -1;
+        for(let name in productCounts) {
+            if(productCounts[name] > maxQty) {
+                maxQty = productCounts[name];
+                topProduct = `${name} (${maxQty}x)`;
+            }
+        }
+
+        // Statistiken ins DOM schreiben
+        document.getElementById('statCount').innerText = totalSalesCount;
+        document.getElementById('statAvg').innerText = avgSale.toFixed(2) + ' €';
+        document.getElementById('statTopProduct').innerText = topProduct;
+        document.getElementById('statPaymentSplit').innerText = `Bar: ${cashCount} | Karte: ${cardCount}`;
 
         if(history.length === 0) {
             list.innerHTML = `<div style="color: var(--text-muted); text-align:center; padding: 15px; font-size:0.75rem;">Keine Verkäufe vorhanden</div>`;
