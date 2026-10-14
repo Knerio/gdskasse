@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GDS1 Abi Kasse Deluxe</title>
+    <title>GDS1 Abi Kasse Deluxe 🚀</title>
     <!-- Canvas Confetti Library für Overkill-Effekte -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -13,6 +13,9 @@
             --success: #10b981;
             --success-glow: rgba(16, 185, 129, 0.4);
             --danger: #ef4444;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
             --bg: #090d16;
             --card-bg: #111827;
             --text: #f9fafb;
@@ -82,7 +85,7 @@
         }
 
         header {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
             color: white;
             padding: 10px 14px;
             font-size: 1rem;
@@ -93,7 +96,7 @@
             align-items: center;
             margin-bottom: 8px;
             flex-shrink: 0;
-            box-shadow: 0 4px 15px var(--primary-glow);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
         .header-right {
@@ -367,13 +370,35 @@
             box-shadow: none;
         }
 
-        /* Stats Grid in Historie */
+        /* Stats & Charts View Styles */
+        .stats-scroll {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            padding-right: 2px;
+        }
+
+        .revenue-card {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: white;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .revenue-title { font-size: 0.72rem; opacity: 0.8; font-weight: 700; }
+        .revenue-amount { font-size: 1.3rem; font-weight: 900; color: #34d399; text-shadow: 0 0 10px rgba(52, 211, 153, 0.3); }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 6px;
             margin-bottom: 8px;
-            flex-shrink: 0;
         }
 
         .stat-card {
@@ -398,22 +423,128 @@
             color: var(--text);
         }
 
-        .revenue-card {
-            background: linear-gradient(135deg, #1f2937, #111827);
-            color: white;
-            padding: 10px 12px;
+        .chart-box {
+            background: var(--card-item-bg);
+            border: 1px solid var(--border);
             border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .chart-header {
+            font-size: 0.75rem;
+            font-weight: 800;
             margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            color: var(--text);
         }
 
-        .revenue-title { font-size: 0.72rem; opacity: 0.8; font-weight: 700; }
-        .revenue-amount { font-size: 1.2rem; font-weight: 900; color: #34d399; }
+        .time-chart-svg {
+            width: 100%;
+            height: 120px;
+            overflow: visible;
+            cursor: crosshair;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid var(--primary);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transform: translate(-50%, -120%);
+            display: none;
+            z-index: 10;
+            white-space: nowrap;
+            backdrop-filter: blur(4px);
+        }
+
+        .pie-chart-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pie-svg {
+            width: 90px;
+            height: 90px;
+            transform: rotate(-90deg);
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 6px rgba(0,0,0,0.3));
+        }
+
+        .pie-legend {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 0.7rem;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+        }
+
+        .legend-color-box {
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .bar-chart-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            gap: 8px;
+        }
+
+        .bar-label {
+            width: 45px;
+            text-align: right;
+            color: var(--text-muted);
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 10px;
+            background: var(--input-bg);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bar-val {
+            width: 45px;
+            text-align: left;
+        }
 
         .modal {
             display: none;
@@ -422,7 +553,7 @@
             left: 0;
             width: 100vw;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
@@ -462,6 +593,7 @@
             flex: 1;
             margin-bottom: 10px;
             padding-right: 2px;
+            max-height: 200px;
         }
 
         .setting-row {
@@ -474,9 +606,9 @@
         }
 
         .setting-input {
-            width: 85px;
+            width: 80px;
             padding: 5px 8px;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 800;
             background: var(--input-bg);
             color: var(--text);
@@ -490,6 +622,15 @@
         .setting-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        .add-product-box {
+            background: var(--input-bg);
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .payment-options {
@@ -563,12 +704,6 @@
             transition: all 0.2s ease;
         }
 
-        .history-list {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-
         .history-item {
             background: var(--card-item-bg);
             border: 1px solid var(--border);
@@ -576,6 +711,9 @@
             padding: 8px 10px;
             margin-bottom: 6px;
             font-size: 0.78rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             animation: popIn 0.2s ease-out;
         }
 
@@ -602,7 +740,7 @@
 
 <div class="container">
     <header>
-        <span>🎓 GDS1 Abi Kasse</span>
+        <span>🎓 GDS1 Abi Kasse (by Dario & Lino</span>
         <div class="header-right">
             <span class="badge" id="headerItemCount">0 Stk.</span>
             <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Theme wechseln">🌙</button>
@@ -612,7 +750,7 @@
 
     <div class="tab-bar">
         <button class="tab-btn active" onclick="switchTab('kasse')">🛒 Kasse</button>
-        <button class="tab-btn" onclick="switchTab('historie')">📜 Statistiken & Historie</button>
+        <button class="tab-btn" onclick="switchTab('historie')">📊 Statistiken & Charts</button>
     </div>
 
     <!-- KASSE VIEW -->
@@ -633,46 +771,120 @@
         </div>
     </div>
 
-    <!-- HISTORIE VIEW -->
+    <!-- STATISTIKEN & CHARTS VIEW -->
     <div id="view-historie" class="view">
-        <div class="revenue-card">
-            <div>
-                <div class="revenue-title">Gesamtumsatz</div>
-                <div class="revenue-amount" id="totalRevenue">0,00 €</div>
+        <div class="stats-scroll">
+            <div class="revenue-card">
+                <div>
+                    <div class="revenue-title">Gesamtumsatz</div>
+                    <div class="revenue-amount" id="totalRevenue">0,00 €</div>
+                </div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: 700;">Live synchronisiert</div>
             </div>
-            <button onclick="clearHistory()" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">Löschen</button>
-        </div>
 
-        <!-- Zusätzliche Statistiken -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-title">Anzahl Verkäufe</div>
-                <div class="stat-value" id="statCount">0</div>
+            <!-- Kennzahlen-Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Anzahl Verkäufe</div>
+                    <div class="stat-value" id="statCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Durchschnitt / Verkauf</div>
+                    <div class="stat-value" id="statAvg">0,00 €</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Beliebtestes Produkt</div>
+                    <div class="stat-value" id="statTopProduct" style="font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Zahlungsarten (Bar / Karte)</div>
+                    <div class="stat-value" id="statPaymentSplit" style="font-size: 0.78rem;">0 | 0</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-title">Durchschnitt / Verkauf</div>
-                <div class="stat-value" id="statAvg">0,00 €</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Beliebtestes Produkt</div>
-                <div class="stat-value" id="statTopProduct" style="font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Bar vs. Karte</div>
-                <div class="stat-value" id="statPaymentSplit" style="font-size: 0.78rem;">Bar: 0 | Karte: 0</div>
-            </div>
-        </div>
 
-        <div class="history-list" id="historyList"></div>
+            <!-- Produkt-Verteilungsdiagramm Box -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>🥧 Produkt-Verteilungsdiagramm</span>
+                </div>
+                <div class="pie-chart-container">
+                    <svg class="pie-svg" id="pieChartSvg" viewBox="0 0 32 32">
+                        <!-- Dynamisches Diagramm -->
+                    </svg>
+                    <div class="pie-legend" id="pieLegend">
+                        <span style="color:var(--text-muted);">Noch keine Daten</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Umsatzverlauf Box -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>📈 Umsatzverlauf</span>
+                </div>
+                <div id="chartTooltip" class="chart-tooltip"></div>
+                <svg class="time-chart-svg" id="timeChartSvg" viewBox="0 0 400 120">
+                    <!-- Dynamischer Verlauf -->
+                </svg>
+            </div>
+
+            <!-- Balkendiagramm Box (Bar vs Karte) -->
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>💳 Zahlungsarten-Vergleich</span>
+                </div>
+                <div class="bar-chart-bars">
+                    <div class="bar-row">
+                        <span class="bar-label">Bar</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" id="barCashFill" style="width: 0%; background: var(--success);"></div>
+                        </div>
+                        <span class="bar-val" id="barCashVal">0 €</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">Karte</span>
+                        <div class="bar-track">
+                            <div class="bar-fill" id="barCardFill" style="width: 0%; background: var(--primary);"></div>
+                        </div>
+                        <span class="bar-val" id="barCardVal">0 €</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verkaufshistorie -->
+            <div class="chart-header" style="margin-top: 10px;">
+                <span>📜 Verkaufshistorie</span>
+            </div>
+            <div id="historyList"></div>
+        </div>
     </div>
 </div>
 
 <!-- SETTINGS MODAL -->
 <div class="modal" id="settingsModal">
     <div class="modal-content">
-        <h3 style="margin: 0 0 10px 0; font-size: 1rem; text-align: center;">Preise anpassen</h3>
+        <h3 style="margin: 0 0 8px 0; font-size: 1rem; text-align: center;">Preise & Produkte verwalten</h3>
         <div class="settings-list" id="settingsList"></div>
-        <button class="btn-main" onclick="saveSettings()" style="background: linear-gradient(135deg, var(--primary), #1d4ed8); margin-bottom: 6px;">Speichern</button>
+
+        <!-- Eigene Produkte hinzufügen -->
+        <div class="add-product-box">
+            <div style="font-size: 0.72rem; font-weight: 800; margin-bottom: 6px; color: var(--primary);">➕ Neues Produkt hinzufügen (z.B. Crepe mit Nutella):</div>
+            <div style="display: grid; grid-template-columns: 40px 1fr; gap: 5px; margin-bottom: 5px;">
+                <input type="text" id="newProdIcon" placeholder="🥞" class="setting-input" style="width: 100%; text-align: center;" maxlength="2">
+                <input type="text" id="newProdName" placeholder="Produktname (z.B. Crepe Nutella)" class="setting-input" style="width: 100%; text-align: left;">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px;">
+                <input type="number" id="newProdPrice" placeholder="Preis (€)" step="0.01" class="setting-input" style="width: 100%;">
+                <select id="newProdCategory" class="setting-input" style="width: 100%; text-align: left;">
+                    <option value="Speisen & Gebäck">Speisen & Gebäck</option>
+                    <option value="Getränke">Getränke</option>
+                    <option value="Sonstiges">Sonstiges</option>
+                </select>
+            </div>
+            <button class="btn-main" onclick="addNewProduct()" style="padding: 8px; font-size: 0.8rem; background: linear-gradient(135deg, var(--primary), #1d4ed8);">Produkt erstellen</button>
+        </div>
+
+        <button class="btn-main" onclick="saveSettings()" style="background: linear-gradient(135deg, var(--success), #059669); margin-bottom: 6px;">Speichern & Schließen</button>
         <button class="btn-cancel" onclick="closeSettings()">Abbrechen</button>
     </div>
 </div>
@@ -682,7 +894,7 @@
     <div class="modal-content" style="max-height: 80vh;">
         <h3 style="margin: 0 0 4px 0; font-size: 1rem; text-align: center;">Zahlung abwickeln</h3>
         
-        <!-- Zu zahlender Betrag in Grün hervorgehoben -->
+        <!-- Grüner Betrag -->
         <div style="text-align: center; margin-bottom: 12px; background: rgba(16, 185, 129, 0.12); padding: 10px; border-radius: 10px; border: 1.5px solid var(--success);">
             <span style="font-size: 0.75rem; color: var(--success); font-weight: 800; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Zu zahlender Betrag</span>
             <span id="checkoutTotalDisplay" style="font-size: 1.5rem; font-weight: 900; color: var(--success);">0,00 €</span>
@@ -812,21 +1024,72 @@
 
     function openSettings() {
         vibrate(25);
+        renderSettingsList();
+        showModal('settingsModal');
+    }
+
+    function renderSettingsList() {
         const list = document.getElementById('settingsList');
         let html = '';
-        catalog.forEach(cat => {
+        catalog.forEach((cat, catIndex) => {
             html += `<div style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); margin: 8px 0 4px 0; text-transform: uppercase;">${cat.category}</div>`;
-            cat.items.forEach(item => {
+            cat.items.forEach((item, itemIndex) => {
                 html += `
                     <div class="setting-row">
-                        <span>${item.icon} ${item.name}</span>
-                        <input type="number" step="0.01" class="setting-input" data-id="${item.id}" value="${item.price.toFixed(2)}">
+                        <span style="display:flex; align-items:center; gap:5px;">${item.icon} ${item.name}</span>
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <input type="number" step="0.01" class="setting-input price-input" data-cat="${catIndex}" data-item="${itemIndex}" value="${item.price.toFixed(2)}">
+                            <button onclick="deleteProduct(${catIndex}, ${itemIndex})" style="background:rgba(239,68,68,0.2); color:#ef4444; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer;">✕</button>
+                        </div>
                     </div>
                 `;
             });
         });
         list.innerHTML = html;
-        showModal('settingsModal');
+    }
+
+    function addNewProduct() {
+        vibrate(20);
+        let icon = document.getElementById('newProdIcon').value.trim() || '🥞';
+        let name = document.getElementById('newProdName').value.trim();
+        let price = parseFloat(document.getElementById('newProdPrice').value);
+        let categoryName = document.getElementById('newProdCategory').value;
+
+        if(!name || isNaN(price) || price < 0) {
+            alert('Bitte gib einen gültigen Namen und Preis ein!');
+            return;
+        }
+
+        let newId = 'custom_' + Date.now();
+        let targetCat = catalog.find(c => c.category === categoryName);
+        
+        if(!targetCat) {
+            targetCat = { category: categoryName, items: [] };
+            catalog.push(targetCat);
+        }
+
+        targetCat.items.push({ id: newId, name, price, icon });
+
+        document.getElementById('newProdIcon').value = '';
+        document.getElementById('newProdName').value = '';
+        document.getElementById('newProdPrice').value = '';
+
+        renderSettingsList();
+        renderCatalog();
+        saveCatalogStorage();
+    }
+
+    function deleteProduct(catIndex, itemIndex) {
+        vibrate(25);
+        if(confirm('Möchtest du dieses Produkt wirklich löschen?')) {
+            catalog[catIndex].items.splice(itemIndex, 1);
+            if(catalog[catIndex].items.length === 0) {
+                catalog.splice(catIndex, 1);
+            }
+            renderSettingsList();
+            renderCatalog();
+            saveCatalogStorage();
+        }
     }
 
     function closeSettings() {
@@ -836,22 +1099,23 @@
 
     function saveSettings() {
         vibrate([30, 50, 30]);
-        const inputs = document.querySelectorAll('.setting-input');
+        const inputs = document.querySelectorAll('.price-input');
         inputs.forEach(input => {
-            let id = input.getAttribute('data-id');
+            let catIdx = input.getAttribute('data-cat');
+            let itemIdx = input.getAttribute('data-item');
             let newPrice = parseFloat(input.value);
             if(!isNaN(newPrice) && newPrice >= 0) {
-                catalog.forEach(cat => {
-                    cat.items.forEach(item => {
-                        if(item.id === id) item.price = newPrice;
-                    });
-                });
+                catalog[catIdx].items[itemIdx].price = newPrice;
             }
         });
-        localStorage.setItem('kassen_catalog', JSON.stringify(catalog));
+        saveCatalogStorage();
         closeSettings();
         renderCatalog();
         updateCartUI();
+    }
+
+    function saveCatalogStorage() {
+        localStorage.setItem('kassen_catalog', JSON.stringify(catalog));
     }
 
     function addToCart(id, name, price, icon) {
@@ -1006,20 +1270,13 @@
         }
     }
 
-    // Mehr Konfetti-Overkill für den Abschluss
     function triggerOverkillConfetti() {
         if (typeof confetti === 'function') {
-            // Standard-Burst
-            confetti({
-                particleCount: 120,
-                spread: 100,
-                origin: { y: 0.6 }
-            });
-            // Seitliche Kanonen nach kurzer Verzögerung
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
             setTimeout(() => {
-                confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 } });
-            }, 250);
+                confetti({ particleCount: 80, angle: 60, spread: 70, origin: { x: 0, y: 0.7 } });
+                confetti({ particleCount: 80, angle: 120, spread: 70, origin: { x: 1, y: 0.7 } });
+            }, 300);
         }
     }
 
@@ -1031,6 +1288,8 @@
         let history = JSON.parse(localStorage.getItem('kassen_history') || '[]');
         
         history.unshift({
+            id: 'sale_' + Date.now(),
+            timestamp: new Date().getTime(),
             date: new Date().toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'}),
             items: JSON.parse(JSON.stringify(cart)),
             total: total.toFixed(2),
@@ -1047,6 +1306,16 @@
         completeSale('SumUp');
     }
 
+    function deleteSale(saleId) {
+        vibrate(20);
+        if(confirm('Möchtest du diesen spezifischen Umsatz wirklich löschen?')) {
+            let history = JSON.parse(localStorage.getItem('kassen_history') || '[]');
+            history = history.filter(s => s.id !== saleId);
+            localStorage.setItem('kassen_history', JSON.stringify(history));
+            renderHistory();
+        }
+    }
+
     function renderHistory() {
         const list = document.getElementById('historyList');
         let history = JSON.parse(localStorage.getItem('kassen_history') || '[]');
@@ -1054,17 +1323,24 @@
         let sum = history.reduce((acc, sale) => acc + parseFloat(sale.total), 0);
         document.getElementById('totalRevenue').innerText = sum.toFixed(2) + ' €';
 
-        // Statistiken berechnen
         let totalSalesCount = history.length;
         let avgSale = totalSalesCount > 0 ? sum / totalSalesCount : 0;
         
         let cashCount = 0;
         let cardCount = 0;
+        let cashSum = 0;
+        let cardSum = 0;
         let productCounts = {};
 
         history.forEach(sale => {
-            if(sale.method === 'Bar') cashCount++;
-            else cardCount++;
+            let saleTotal = parseFloat(sale.total);
+            if(sale.method === 'Bar') {
+                cashCount++;
+                cashSum += saleTotal;
+            } else {
+                cardCount++;
+                cardSum += saleTotal;
+            }
 
             for(let id in sale.items) {
                 let p = sale.items[id];
@@ -1082,39 +1358,185 @@
             }
         }
 
-        // Statistiken ins DOM schreiben
         document.getElementById('statCount').innerText = totalSalesCount;
         document.getElementById('statAvg').innerText = avgSale.toFixed(2) + ' €';
         document.getElementById('statTopProduct').innerText = topProduct;
-        document.getElementById('statPaymentSplit').innerText = `Bar: ${cashCount} | Karte: ${cardCount}`;
+        document.getElementById('statPaymentSplit').innerText = `${cashCount} Bar | ${cardCount} Karte`;
+
+        let totalCashCardSum = cashSum + cardSum;
+        let cashPercent = totalCashCardSum > 0 ? (cashSum / totalCashCardSum) * 100 : 0;
+        let cardPercent = totalCashCardSum > 0 ? (cardSum / totalCashCardSum) * 100 : 0;
+
+        document.getElementById('barCashFill').style.width = cashPercent + '%';
+        document.getElementById('barCardFill').style.width = cardPercent + '%';
+        document.getElementById('barCashVal').innerText = cashSum.toFixed(2) + ' €';
+        document.getElementById('barCardVal').innerText = cardSum.toFixed(2) + ' €';
+
+        renderPieChart(productCounts);
+        renderTimeChart(history);
 
         if(history.length === 0) {
             list.innerHTML = `<div style="color: var(--text-muted); text-align:center; padding: 15px; font-size:0.75rem;">Keine Verkäufe vorhanden</div>`;
             return;
         }
+
         let html = '';
         history.forEach(s => {
             let desc = [];
             for(let id in s.items) desc.push(`${s.items[id].qty}x ${s.items[id].name}`);
             html += `
                 <div class="history-item">
-                    <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:2px;">
-                        <span>${s.total} € (${s.method})</span>
-                        <span style="color:var(--text-muted); font-weight:normal; font-size:0.68rem;">${s.date} Uhr</span>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:2px; gap:8px;">
+                            <span>${s.total} € (${s.method})</span>
+                            <span style="color:var(--text-muted); font-weight:normal; font-size:0.68rem;">${s.date} Uhr</span>
+                        </div>
+                        <div style="color:var(--text-muted); font-size:0.68rem;">${desc.join(', ')}</div>
                     </div>
-                    <div style="color:var(--text-muted); font-size:0.68rem;">${desc.join(', ')}</div>
+                    <button onclick="deleteSale('${s.id}')" style="background:rgba(239,68,68,0.2); color:#ef4444; border:none; width:26px; height:26px; border-radius:6px; font-weight:bold; cursor:pointer; flex-shrink:0;">✕</button>
                 </div>
             `;
         });
         list.innerHTML = html;
     }
 
-    function clearHistory() {
-        vibrate(40);
-        if(confirm('Möchtest du die Historie wirklich löschen?')) {
-            localStorage.removeItem('kassen_history');
-            renderHistory();
+    function renderPieChart(productCounts) {
+        const svg = document.getElementById('pieChartSvg');
+        const legend = document.getElementById('pieLegend');
+        
+        let entries = Object.entries(productCounts);
+        let totalQty = entries.reduce((acc, curr) => acc + curr[1], 0);
+
+        if (totalQty === 0) {
+            svg.innerHTML = `<circle cx="16" cy="16" r="12" fill="none" stroke="var(--border)" stroke-width="6"></circle>`;
+            legend.innerHTML = `<span style="color:var(--text-muted); font-size:0.68rem;">Noch keine Verkäufe aufgezeichnet</span>`;
+            return;
         }
+
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f43f5e', '#a855f7', '#14b8a6'];
+        
+        const radius = 12;
+        const circumference = 2 * Math.PI * radius;
+        
+        let cumulativePercent = 0;
+        let svgContent = '';
+        let legendContent = '';
+
+        entries.forEach(([name, qty], index) => {
+            let percent = (qty / totalQty);
+            let color = colors[index % colors.length];
+            
+            let strokeLength = percent * circumference;
+            let spaceLength = circumference - strokeLength;
+            let dashOffset = -(cumulativePercent * circumference);
+
+            svgContent += `<circle cx="16" cy="16" r="${radius}" fill="none" stroke="${color}" stroke-width="6" 
+                stroke-dasharray="${strokeLength.toFixed(2)} ${spaceLength.toFixed(2)}" 
+                stroke-dashoffset="${dashOffset.toFixed(2)}"></circle>`;
+            
+            legendContent += `
+                <div class="legend-item">
+                    <span style="display:flex; align-items:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:130px;">
+                        <span class="legend-color-box" style="background:${color};"></span>${name}
+                    </span>
+                    <span style="font-weight:900;">${qty}x (${(percent * 100).toFixed(0)}%)</span>
+                </div>
+            `;
+
+            cumulativePercent += percent;
+        });
+
+        svg.innerHTML = svgContent;
+        legend.innerHTML = legendContent;
+    }
+
+    function renderTimeChart(history) {
+        const svg = document.getElementById('timeChartSvg');
+        const tooltip = document.getElementById('chartTooltip');
+        
+        if (history.length === 0) {
+            svg.innerHTML = `<text x="200" y="65" fill="var(--text-muted)" font-size="11" text-anchor="middle">Noch keine Verlaufsdaten vorhanden</text>`;
+            return;
+        }
+
+        let sorted = [...history].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+        
+        let cumulative = 0;
+        let points = sorted.map(s => {
+            cumulative += parseFloat(s.total);
+            return { time: s.date, total: cumulative };
+        });
+
+        let maxVal = Math.max(...points.map(p => p.total), 10);
+        let minVal = 0;
+        
+        let width = 400;
+        let height = 120;
+        let padding = 25;
+
+        let svgContent = `
+            <defs>
+                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
+                </linearGradient>
+            </defs>
+            <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="var(--border)" stroke-width="1.5" />
+            <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="var(--border)" stroke-width="1.5" />
+        `;
+
+        if (points.length === 1) {
+            let cx = width / 2;
+            let cy = height - padding - ((points[0].total - minVal) / (maxVal - minVal || 1)) * (height - 2 * padding);
+            svgContent += `<circle cx="${cx}" cy="${cy}" r="6" fill="#3b82f6" stroke="var(--card-bg)" stroke-width="2" style="cursor:pointer;" 
+                onmouseenter="showTooltip(event, '${points[0].time}', ${points[0].total}, ${cx}, ${cy})" onmouseleave="hideTooltip()"
+                ontouchstart="showTooltip(event, '${points[0].time}', ${points[0].total}, ${cx}, ${cy})"/>`;
+            svgContent += `<text x="${cx}" y="${cy - 10}" fill="var(--text)" font-size="10" font-weight="bold" text-anchor="middle">${points[0].total.toFixed(2)} €</text>`;
+        } else {
+            let coords = points.map((p, i) => {
+                let x = padding + (i / (points.length - 1)) * (width - 2 * padding - 10);
+                let y = (height - padding) - ((p.total - minVal) / (maxVal - minVal || 1)) * (height - 2 * padding);
+                return { x, y, total: p.total, time: p.time };
+            });
+
+            let pathD = `M ${coords[0].x} ${coords[0].y}`;
+            coords.forEach(c => pathD += ` L ${c.x} ${c.y}`);
+
+            let areaD = `${pathD} L ${coords[coords.length - 1].x} ${height - padding} L ${coords[0].x} ${height - padding} Z`;
+
+            svgContent += `<path d="${areaD}" fill="url(#lineGrad)" />`;
+            svgContent += `<path d="${pathD}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />`;
+
+            coords.forEach(c => {
+                svgContent += `<circle cx="${c.x}" cy="${c.y}" r="5" fill="#3b82f6" stroke="var(--card-bg)" stroke-width="2" style="cursor:pointer; transition: r 0.15s ease;"
+                    onmouseenter="showTooltip(event, '${c.time}', ${c.total}, ${c.x}, ${c.y})" onmouseleave="hideTooltip()"
+                    ontouchstart="showTooltip(event, '${c.time}', ${c.total}, ${c.x}, ${c.y})"/>`;
+            });
+
+            let last = coords[coords.length - 1];
+            svgContent += `<text x="${last.x}" y="${last.y - 10}" fill="#3b82f6" font-size="10" font-weight="900" text-anchor="middle">${last.total.toFixed(2)} €</text>`;
+        }
+
+        svg.innerHTML = svgContent;
+    }
+
+    function showTooltip(event, time, total, cx, cy) {
+        vibrate(10);
+        const tooltip = document.getElementById('chartTooltip');
+        const box = document.getElementById('timeChartSvg').getBoundingClientRect();
+        
+        let leftPx = (cx / 400) * box.width;
+        let topPx = (cy / 120) * box.height;
+
+        tooltip.style.left = leftPx + 'px';
+        tooltip.style.top = topPx + 'px';
+        tooltip.innerHTML = `🕒 ${time} Uhr<br>💰 Stand: ${total.toFixed(2)} €`;
+        tooltip.style.display = 'block';
+    }
+
+    function hideTooltip() {
+        const tooltip = document.getElementById('chartTooltip');
+        tooltip.style.display = 'none';
     }
 
     init();
