@@ -3,28 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GDS1 Abi Kasse</title>
+    <title>GDS1 Abi Kasse Deluxe</title>
+    <!-- Canvas Confetti Library für Overkill-Effekte -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
             --success: #10b981;
-            --success-dark: #059669;
+            --success-glow: rgba(16, 185, 129, 0.4);
             --danger: #ef4444;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --bg: #090d16;
+            --card-bg: #111827;
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+            --card-item-bg: #1f2937;
+            --input-bg: #0b0f19;
+            --chip-bg: #374151;
+            --chip-border: #4b5563;
+            --modal-bg: #111827;
+            --tab-bar-bg: #1f2937;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        [data-theme="light"] {
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --card-item-bg: #f9fafb;
+            --input-bg: #ffffff;
+            --chip-bg: #e5e7eb;
+            --chip-border: #d1d5db;
+            --modal-bg: #ffffff;
+            --tab-bar-bg: #f3f4f6;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                        color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                        border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         
         html, body {
             height: 100dvh;
             width: 100vw;
             overflow: hidden;
             background-color: var(--bg);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
             color: var(--text);
         }
         
@@ -32,34 +64,36 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 6px;
+            padding: 8px;
         }
 
         .container {
             width: 100%;
             height: 100%;
             background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid var(--border);
             overflow: hidden;
+            backdrop-filter: blur(20px);
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
-            padding: 8px 12px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             flex-shrink: 0;
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .header-right {
@@ -70,51 +104,65 @@
 
         .badge {
             background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 20px;
             font-size: 0.75rem;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .settings-btn {
+        .badge.bump {
+            transform: scale(1.35) rotate(-3deg);
+        }
+
+        .icon-btn {
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            width: 26px;
-            height: 26px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.82) rotate(15deg);
+            background: rgba(255, 255, 255, 0.4);
         }
 
         .tab-bar {
             display: flex;
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 2px;
-            margin-bottom: 6px;
+            background: var(--tab-bar-bg);
+            border-radius: 10px;
+            padding: 3px;
+            margin-bottom: 8px;
             flex-shrink: 0;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 6px;
+            padding: 7px;
             border: none;
             background: none;
-            font-weight: 600;
-            font-size: 0.8rem;
+            font-weight: 700;
+            font-size: 0.82rem;
             color: var(--text-muted);
             cursor: pointer;
             text-align: center;
-            border-radius: 6px;
+            border-radius: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .tab-btn.active {
-            background: white;
+            background: var(--card-bg);
             color: var(--primary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .view {
@@ -123,30 +171,35 @@
             flex: 1;
             overflow: hidden;
             min-height: 0;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
         .view.active {
             display: flex;
+            opacity: 1;
+            transform: scale(1);
         }
 
         .catalog-container {
             flex: 1;
             overflow-y: auto;
             padding-right: 2px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             min-height: 0;
         }
 
         .category-title {
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin: 6px 0 4px 0;
+            font-size: 0.68rem;
+            font-weight: 800;
+            margin: 8px 0 6px 0;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .category-title::after {
@@ -159,34 +212,43 @@
         .product-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 8px;
         }
 
         .product-card {
-            background: #f8fafc;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 4px;
+            background: var(--card-item-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 6px;
             text-align: center;
             cursor: pointer;
-            user-select: none;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        border-color 0.15s ease, 
+                        box-shadow 0.15s ease;
         }
 
         .product-card:active {
-            transform: scale(0.96);
+            transform: scale(0.9) translateY(2px);
             border-color: var(--primary);
-            background: #eff6ff;
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         .product-icon {
-            font-size: 1.5rem;
-            margin-bottom: 2px;
+            font-size: 1.6rem;
+            margin-bottom: 4px;
             display: block;
+            transition: transform 0.2s ease;
+        }
+
+        .product-card:active .product-icon {
+            transform: scale(1.3) rotate(-10deg);
         }
 
         .product-name {
-            font-weight: 600;
-            font-size: 0.75rem;
+            font-weight: 700;
+            font-size: 0.76rem;
             margin-bottom: 2px;
             color: var(--text);
             white-space: nowrap;
@@ -196,15 +258,15 @@
 
         .product-price {
             color: var(--primary);
-            font-weight: 700;
-            font-size: 0.72rem;
+            font-weight: 800;
+            font-size: 0.75rem;
         }
 
         .cart-section {
-            background: #f8fafc;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 6px 8px;
+            background: var(--card-item-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 8px 10px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
@@ -212,88 +274,115 @@
 
         .cart-list {
             overflow-y: auto;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             padding-right: 2px;
-            max-height: 120px;
+            max-height: 110px;
         }
 
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2px 0;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 0.73rem;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .cart-item-info {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .cart-controls {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
 
         .qty-btn {
-            background: #e2e8f0;
+            background: var(--chip-bg);
             color: var(--text);
-            border: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.75rem;
+            border: 1px solid var(--chip-border);
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            font-weight: 800;
+            font-size: 0.85rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.1s ease, background-color 0.1s ease;
+        }
+
+        .qty-btn:active {
+            transform: scale(0.8);
+            background: var(--primary);
+            color: white;
         }
 
         .total-box {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.9rem;
-            font-weight: 800;
-            margin: 2px 0 4px 0;
-            padding-top: 3px;
-            border-top: 2px dashed #cbd5e1;
+            font-size: 0.95rem;
+            font-weight: 900;
+            margin: 4px 0 6px 0;
+            padding-top: 6px;
+            border-top: 2px dashed var(--border);
             color: var(--text);
         }
 
         .btn-main {
             width: 100%;
-            background: linear-gradient(135deg, var(--success), var(--success-dark));
+            background: linear-gradient(135deg, var(--success), #059669);
             color: white;
             border: none;
-            padding: 10px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            border-radius: 10px;
             cursor: pointer;
             text-align: center;
+            box-shadow: 0 4px 15px var(--success-glow);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        box-shadow 0.15s ease, opacity 0.15s ease;
         }
 
-        .btn-main:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-main:active:not(:disabled) {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px var(--success-glow);
+        }
+
+        .btn-main:disabled { 
+            opacity: 0.35; 
+            cursor: not-allowed; 
+            box-shadow: none;
+        }
 
         .revenue-card {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background: linear-gradient(135deg, #1f2937, #111827);
             color: white;
-            padding: 8px 10px;
-            border-radius: 10px;
-            margin-bottom: 6px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .revenue-title { font-size: 0.7rem; opacity: 0.8; font-weight: 600; }
-        .revenue-amount { font-size: 1.1rem; font-weight: 800; color: #34d399; }
+        .revenue-title { font-size: 0.72rem; opacity: 0.8; font-weight: 700; }
+        .revenue-amount { font-size: 1.2rem; font-weight: 900; color: #34d399; }
 
         .modal {
             display: none;
@@ -302,31 +391,45 @@
             left: 0;
             width: 100vw;
             height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
             z-index: 100;
-            padding: 10px;
+            padding: 12px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
         }
 
         .modal-content {
-            transform: scale(1.4);
-            background: white;
+            background: var(--modal-bg);
+            color: var(--text);
             width: 100%;
+            max-width: 440px;
             max-height: 85vh;
-            max-width: 480px;
-            border-radius: 14px;
-            padding: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
+            transform: scale(0.85) translateY(20px);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid var(--border);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1) translateY(0);
         }
 
         .settings-list {
             overflow-y: auto;
             flex: 1;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             padding-right: 2px;
         }
 
@@ -334,72 +437,99 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 0;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
+            font-size: 0.82rem;
         }
 
         .setting-input {
-            width: 80px;
-            padding: 4px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 6px;
+            width: 85px;
+            padding: 5px 8px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
             text-align: right;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .setting-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
         }
 
         .payment-options {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .pay-btn {
-            padding: 7px;
+            padding: 10px;
             border: 2px solid var(--border);
-            background: #f8fafc;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.78rem;
+            background: var(--card-item-bg);
+            color: var(--text);
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.8rem;
             cursor: pointer;
             text-align: center;
+            transition: all 0.15s ease;
+        }
+
+        .pay-btn:active {
+            transform: scale(0.95);
         }
 
         .pay-btn.selected {
             border-color: var(--primary);
-            background: #eff6ff;
+            background: rgba(37, 99, 235, 0.2);
             color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
         .cash-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
-            margin-bottom: 6px;
+            gap: 5px;
+            margin-bottom: 8px;
         }
 
         .cash-chip {
-            background: #f1f5f9;
-            border: 1.5px solid #cbd5e1;
-            padding: 6px 2px;
-            border-radius: 6px;
-            font-size: 0.73rem;
-            font-weight: 700;
+            background: var(--chip-bg);
+            border: 1.5px solid var(--chip-border);
+            color: var(--text);
+            padding: 8px 2px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
             cursor: pointer;
             text-align: center;
+            transition: transform 0.1s ease, background-color 0.1s ease;
+        }
+
+        .cash-chip:active {
+            transform: scale(0.88);
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         .change-display {
-            background: #f1f5f9;
-            border: 1.5px solid #cbd5e1;
+            background: var(--chip-bg);
+            border: 1.5px solid var(--chip-border);
             color: var(--text-muted);
-            padding: 6px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
             text-align: center;
+            transition: all 0.2s ease;
         }
 
         .history-list {
@@ -409,12 +539,31 @@
         }
 
         .history-item {
-            background: #f8fafc;
+            background: var(--card-item-bg);
             border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            font-size: 0.78rem;
+            animation: popIn 0.2s ease-out;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            background: var(--chip-bg);
+            border: 1px solid var(--border);
+            padding: 8px;
             border-radius: 8px;
-            padding: 5px 7px;
-            margin-bottom: 4px;
-            font-size: 0.75rem;
+            margin-top: 6px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .btn-cancel:active {
+            background: var(--border);
         }
     </style>
 </head>
@@ -425,7 +574,8 @@
         <span>🎓 GDS1 Abi Kasse</span>
         <div class="header-right">
             <span class="badge" id="headerItemCount">0 Stk.</span>
-            <button class="settings-btn" onclick="openSettings()" title="Preise anpassen">⚙️</button>
+            <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Theme wechseln">🌙</button>
+            <button class="icon-btn" onclick="openSettings()" title="Preise anpassen">⚙️</button>
         </div>
     </header>
 
@@ -444,7 +594,7 @@
             </div>
             
             <div class="total-box">
-                <span style="font-size: 0.78rem; color: var(--text-muted);">Gesamtsumme:</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Gesamtsumme:</span>
                 <span id="totalPrice">0,00 €</span>
             </div>
 
@@ -459,7 +609,7 @@
                 <div class="revenue-title">Gesamtumsatz</div>
                 <div class="revenue-amount" id="totalRevenue">0,00 €</div>
             </div>
-            <button onclick="clearHistory()" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer;">Löschen</button>
+            <button onclick="clearHistory()" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">Löschen</button>
         </div>
         <div class="history-list" id="historyList"></div>
     </div>
@@ -468,17 +618,17 @@
 <!-- SETTINGS MODAL -->
 <div class="modal" id="settingsModal">
     <div class="modal-content">
-        <h3 style="margin: 0 0 8px 0; font-size: 0.95rem; text-align: center;">Preise anpassen</h3>
+        <h3 style="margin: 0 0 10px 0; font-size: 1rem; text-align: center;">Preise anpassen</h3>
         <div class="settings-list" id="settingsList"></div>
-        <button class="btn-main" onclick="saveSettings()" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); margin-bottom: 6px;">Speichern</button>
-        <button onclick="closeSettings()" style="width: 100%; background: #e2e8f0; border: none; padding: 7px; border-radius: 6px; font-weight: 700; font-size: 0.78rem; color: var(--text-muted); cursor: pointer;">Abbrechen</button>
+        <button class="btn-main" onclick="saveSettings()" style="background: linear-gradient(135deg, var(--primary), #1d4ed8); margin-bottom: 6px;">Speichern</button>
+        <button class="btn-cancel" onclick="closeSettings()">Abbrechen</button>
     </div>
 </div>
 
 <!-- CHECKOUT MODAL -->
 <div class="modal" id="checkoutModal">
     <div class="modal-content" style="max-height: 80vh;">
-        <h3 style="margin: 0 0 8px 0; font-size: 0.95rem; text-align: center;">Zahlung abwickeln</h3>
+        <h3 style="margin: 0 0 10px 0; font-size: 1rem; text-align: center;">Zahlung abwickeln</h3>
         <div class="payment-options">
             <div class="pay-btn selected" id="btnPayCash" onclick="selectPayment('cash')">💵 Barzahlung</div>
             <div class="pay-btn" id="btnPayCard" onclick="selectPayment('card')">💳 SumUp Karte</div>
@@ -497,9 +647,9 @@
                 <div class="cash-chip" onclick="addCash(0.1)">0,10 €</div>
             </div>
             
-            <div style="margin-bottom: 6px;">
-                <label style="font-size: 0.7rem; color: var(--text-muted); display:block; margin-bottom:2px; font-weight:600;">Gegeben (€):</label>
-                <input type="number" id="givenAmount" placeholder="0.00" step="0.01" style="width: 100%; padding: 7px; font-size: 0.95rem; font-weight:700; border: 1.5px solid #cbd5e1; border-radius: 6px; text-align: right;" oninput="calcChange()">
+            <div style="margin-bottom: 8px;">
+                <label style="font-size: 0.72rem; color: var(--text-muted); display:block; margin-bottom:3px; font-weight:700;">Gegeben (€):</label>
+                <input type="number" id="givenAmount" placeholder="0.00" step="0.01" class="setting-input" style="width: 100%; padding: 8px; font-size: 1rem;" oninput="calcChange()">
             </div>
 
             <div class="change-display" id="changeDisplay">Bitte Betrag eingeben</div>
@@ -508,12 +658,12 @@
         </div>
 
         <!-- Kartenzahlung -->
-        <div id="cardSection" style="display: none; text-align: center; padding: 6px 0;">
-            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Das SumUp Terminal wird über die App gestartet:</p>
+        <div id="cardSection" style="display: none; text-align: center; padding: 10px 0;">
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">Das SumUp Terminal wird über die App gestartet:</p>
             <a href="#" id="sumupLink" class="btn-main" style="display: block; text-decoration: none; line-height: 20px;" onclick="completeCardSale()">SumUp App öffnen</a>
         </div>
 
-        <button onclick="closeCheckout()" style="width: 100%; background: #e2e8f0; border: none; padding: 7px; border-radius: 6px; margin-top: 6px; font-weight: 700; font-size: 0.78rem; color: var(--text-muted); cursor: pointer;">Abbrechen</button>
+        <button class="btn-cancel" onclick="closeCheckout()">Abbrechen</button>
     </div>
 </div>
 
@@ -534,6 +684,25 @@
     let catalog = loadCatalog();
     let cart = {};
 
+    function vibrate(ms = 25) {
+        if (navigator.vibrate) navigator.vibrate(ms);
+    }
+
+    function initTheme() {
+        const savedTheme = localStorage.getItem('kassen_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeBtn').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+
+    function toggleTheme() {
+        vibrate(20);
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('kassen_theme', next);
+        document.getElementById('themeBtn').innerText = next === 'dark' ? '☀️' : '🌙';
+    }
+
     function loadCatalog() {
         let saved = localStorage.getItem('kassen_catalog');
         if(saved) {
@@ -543,12 +712,14 @@
     }
 
     function init() {
+        initTheme();
         renderCatalog();
         updateCartUI();
         renderHistory();
     }
 
     function switchTab(tab) {
+        vibrate(15);
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         if(tab === 'kasse') {
@@ -581,10 +752,11 @@
     }
 
     function openSettings() {
+        vibrate(25);
         const list = document.getElementById('settingsList');
         let html = '';
         catalog.forEach(cat => {
-            html += `<div style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); margin: 6px 0 2px 0; text-transform: uppercase;">${cat.category}</div>`;
+            html += `<div style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); margin: 8px 0 4px 0; text-transform: uppercase;">${cat.category}</div>`;
             cat.items.forEach(item => {
                 html += `
                     <div class="setting-row">
@@ -595,14 +767,16 @@
             });
         });
         list.innerHTML = html;
-        document.getElementById('settingsModal').style.display = 'flex';
+        showModal('settingsModal');
     }
 
     function closeSettings() {
-        document.getElementById('settingsModal').style.display = 'none';
+        vibrate(15);
+        hideModal('settingsModal');
     }
 
     function saveSettings() {
+        vibrate([30, 50, 30]);
         const inputs = document.querySelectorAll('.setting-input');
         inputs.forEach(input => {
             let id = input.getAttribute('data-id');
@@ -622,18 +796,28 @@
     }
 
     function addToCart(id, name, price, icon) {
+        vibrate(20);
         if(!cart[id]) cart[id] = { name, price, icon, qty: 0 };
-        cart[id].price = price; // Preis aktualisieren falls er geändert wurde
+        cart[id].price = price;
         cart[id].qty++;
+        triggerBadgeBump();
         updateCartUI();
     }
 
     function changeQty(id, delta) {
+        vibrate(15);
         if(cart[id]) {
             cart[id].qty += delta;
             if(cart[id].qty <= 0) delete cart[id];
         }
+        triggerBadgeBump();
         updateCartUI();
+    }
+
+    function triggerBadgeBump() {
+        const badge = document.getElementById('headerItemCount');
+        badge.classList.add('bump');
+        setTimeout(() => badge.classList.remove('bump'), 200);
     }
 
     function getCartTotal() {
@@ -669,7 +853,7 @@
                     </div>
                     <div class="cart-controls">
                         <button class="qty-btn" onclick="changeQty('${id}', -1)">-</button>
-                        <span style="font-weight:700; width:16px; text-align:center;">${item.qty}</span>
+                        <span style="font-weight:800; width:18px; text-align:center;">${item.qty}</span>
                         <button class="qty-btn" onclick="changeQty('${id}', 1)">+</button>
                     </div>
                 </div>
@@ -680,7 +864,20 @@
         document.getElementById('checkoutBtn').disabled = false;
     }
 
+    function showModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('active'), 10);
+    }
+
+    function hideModal(id) {
+        const modal = document.getElementById(id);
+        modal.classList.remove('active');
+        setTimeout(() => modal.style.display = 'none', 200);
+    }
+
     function openCheckout() {
+        vibrate([20, 30, 20]);
         const { total } = getCartTotal();
         document.getElementById('givenAmount').value = '';
         calcChange();
@@ -688,14 +885,16 @@
         const sumupUrl = `sumupmerchant://pay/1.0?amount=${total.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse`;
         document.getElementById('sumupLink').href = sumupUrl;
 
-        document.getElementById('checkoutModal').style.display = 'flex';
+        showModal('checkoutModal');
     }
 
     function closeCheckout() {
-        document.getElementById('checkoutModal').style.display = 'none';
+        vibrate(15);
+        hideModal('checkoutModal');
     }
 
     function selectPayment(type) {
+        vibrate(20);
         if(type === 'cash') {
             document.getElementById('btnPayCash').classList.add('selected');
             document.getElementById('btnPayCard').classList.remove('selected');
@@ -710,6 +909,7 @@
     }
 
     function addCash(amount) {
+        vibrate(15);
         let current = parseFloat(document.getElementById('givenAmount').value) || 0;
         document.getElementById('givenAmount').value = (current + amount).toFixed(2);
         calcChange();
@@ -722,27 +922,40 @@
         const disp = document.getElementById('changeDisplay');
         
         if (given === 0) {
-            disp.style.background = '#f1f5f9';
-            disp.style.borderColor = '#cbd5e1';
+            disp.style.background = 'var(--chip-bg)';
+            disp.style.borderColor = 'var(--chip-border)';
             disp.style.color = 'var(--text-muted)';
             disp.innerText = `Bitte Betrag eingeben`;
             return;
         }
 
         if(change >= 0) {
-            disp.style.background = '#ecfdf5';
-            disp.style.borderColor = '#a7f3d0';
-            disp.style.color = '#065f46';
+            disp.style.background = 'rgba(16, 185, 129, 0.2)';
+            disp.style.borderColor = 'var(--success)';
+            disp.style.color = 'var(--success)';
             disp.innerText = `Rückgeld: ${change.toFixed(2)} €`;
         } else {
-            disp.style.background = '#fef2f2';
-            disp.style.borderColor = '#fecaca';
-            disp.style.color = '#991b1b';
+            disp.style.background = 'rgba(239, 68, 68, 0.2)';
+            disp.style.borderColor = 'var(--danger)';
+            disp.style.color = 'var(--danger)';
             disp.innerText = `Fehlt noch: ${Math.abs(change).toFixed(2)} €`;
         }
     }
 
+    function triggerConfetti() {
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 80,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    }
+
     function completeSale(method) {
+        vibrate([40, 60, 40]);
+        triggerConfetti();
+
         const { total } = getCartTotal();
         let history = JSON.parse(localStorage.getItem('kassen_history') || '[]');
         
@@ -780,7 +993,7 @@
             for(let id in s.items) desc.push(`${s.items[id].qty}x ${s.items[id].name}`);
             html += `
                 <div class="history-item">
-                    <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:2px;">
+                    <div style="display:flex; justify-content:space-between; font-weight:800; margin-bottom:2px;">
                         <span>${s.total} € (${s.method})</span>
                         <span style="color:var(--text-muted); font-weight:normal; font-size:0.68rem;">${s.date} Uhr</span>
                     </div>
@@ -792,6 +1005,7 @@
     }
 
     function clearHistory() {
+        vibrate(40);
         if(confirm('Möchtest du die Historie wirklich löschen?')) {
             localStorage.removeItem('kassen_history');
             renderHistory();
