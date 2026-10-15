@@ -1208,8 +1208,10 @@
 
         document.getElementById('givenAmount').value = '';
         calcChange();
+
+        const currentUrl=encodeURIComponent(window.location.href);
         
-        const sumupUrl = `sumupmerchant://pay/1.0?amount=${total.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse`;
+        const sumupUrl = `sumupmerchant://pay/1.0?amount=${total.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse&callbackUrl=${currentUrl}`;
         document.getElementById('sumupLink').href = sumupUrl;
 
         showModal('checkoutModal');
