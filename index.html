@@ -1214,7 +1214,7 @@
         const txId = "ABI-" + Date.now(); // Eindeutige Bestell-ID
 
   // URL-Scheme für die SumUp App aufbauen
-        const sumupUrl = `sumupmerchant://pay/1.0?amount=${betrag.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse&affiliate-key=${affiliateKey}&foreign-tx-id=${txId}&callbacksuccess=${currentUrl}&callbackfail=${currentUrl}`;
+        const sumupUrl = `sumupmerchant://pay/1.0?amount=${total.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse&affiliate-key=${affiliateKey}&foreign-tx-id=${txId}&callbacksuccess=${currentUrl}&callbackfail=${currentUrl}`;
         document.getElementById('sumupLink').href = sumupUrl;
 
         showModal('checkoutModal');
