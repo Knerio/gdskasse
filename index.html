@@ -1209,13 +1209,17 @@
         document.getElementById('givenAmount').value = '';
         calcChange();
 
-        const currentUrl = encodeURIComponent(window.location.href);
-        const affiliateKey = "sup_afk_8NKoFtSVcRfMkwxIpHLIh7xXvAbJAbNJ"; // Aus dem SumUp Developer Portal
-        const txId = "ABI-" + Date.now(); // Eindeutige Bestell-ID
+        let itemDescriptions = [];
+        for (let id in cart) {
+            itemDescriptions.push(`${cart[id].name} (${cart[id].qty}x)`);
+        }
+        let transactionTitle = itemDescriptions.length > 0 ? itemDescriptions.join(', ') : "GDS1 Abi Kasse";
 
-  // URL-Scheme für die SumUp App aufbauen
-        const sumupUrl = `sumupmerchant://pay/1.0?amount=${total.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse&affiliate-key=${affiliateKey}&foreign-tx-id=${txId}&callbacksuccess=${currentUrl}&callbackfail=${currentUrl}`;
-        document.getElementById('sumupLink').href = sumupUrl;
+        const currentUrl = encodeURIComponent(window.location.href);
+        const affiliateKey = "sup_afk_8NKoFtSVcRfMkwxIpHLIh7xXvAbJAbNJ"; 
+        const txId = "ABI-" + Date.now(); 
+
+        const sumupUrl = `sumupmerchant://pay/1.0?amount=${total.toFixed(2)}&currency=EUR&title=${encodeURIComponent(transactionTitle)}&affiliate-key=${affiliateKey}&foreign-tx-id=${txId}&callbacksuccess=${currentUrl}&callbackfail=${currentUrl}`;        document.getElementById('sumupLink').href = sumupUrl;
 
         showModal('checkoutModal');
     }
