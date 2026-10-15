@@ -1209,12 +1209,12 @@
         document.getElementById('givenAmount').value = '';
         calcChange();
 
-const currentUrl = encodeURIComponent(window.location.href);
-  const affiliateKey = "sup_afk_8NKoFtSVcRfMkwxIpHLIh7xXvAbJAbNJ"; // Aus dem SumUp Developer Portal
-  const txId = "ABI-" + Date.now(); // Eindeutige Bestell-ID
+        const currentUrl = encodeURIComponent(window.location.href);
+        const affiliateKey = "sup_afk_8NKoFtSVcRfMkwxIpHLIh7xXvAbJAbNJ"; // Aus dem SumUp Developer Portal
+        const txId = "ABI-" + Date.now(); // Eindeutige Bestell-ID
 
   // URL-Scheme für die SumUp App aufbauen
-  const sumupUrl = `sumupmerchant://pay/1.0?amount=${betrag.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse&affiliate-key=${affiliateKey}&foreign-tx-id=${txId}&callbacksuccess=${currentUrl}&callbackfail=${currentUrl}`;
+        const sumupUrl = `sumupmerchant://pay/1.0?amount=${betrag.toFixed(2)}&currency=EUR&title=GDS1%20Abi%20Kasse&affiliate-key=${affiliateKey}&foreign-tx-id=${txId}&callbacksuccess=${currentUrl}&callbackfail=${currentUrl}`;
         document.getElementById('sumupLink').href = sumupUrl;
 
         showModal('checkoutModal');
